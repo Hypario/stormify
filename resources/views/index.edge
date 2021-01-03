@@ -1,17 +1,14 @@
 @layout('layouts/master')
 
 @section('content')
-  <button id="play-queue">Play queue</button>
+  <div id="player">
+    <button id="player-play" class="btn-primary">Play</button>
+  </div>
   @each(song in songs)
     <div class="player">
-      <div class="player-info">
-        <p>{{ song.title }}</p>
-        <div class="player-source" style="display: none;">{{ route('listen', { id: song.id }) }}</div>
-      </div>
-      <div class="buttons">
-        <button class="player-play">play / resume</button>
-        <button class="queue-add">add to queue</button>
-      </div>
+      <p>{{ song.title }}</p>
+      <button class="song-play btn-primary" data-source="{{ route('listen', { id: song.id}) }}">play</button>
+      <button class="queue-add btn-primary" data-source="{{ route('listen', { id: song.id}) }}">add to queue</button>
     </div>
   @else
     <h1>Aucune musique disponible</h1>
