@@ -1,0 +1,9 @@
+@layout('layouts/master')
+
+@section('content')
+  <form method="POST" enctype="multipart/form-data">
+    {{ csrfField() }}
+    <input type="file" name="audio"/>
+    <button type="submit"> Submit</button>
+  </form>
+@endsection
