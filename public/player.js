@@ -18,7 +18,7 @@ document.querySelectorAll(".song-play").forEach((element) => {
   })
 });
 
-document.querySelectorAll(".queue-add").forEach((element) => {
+document.querySelectorAll(".song-queue-add").forEach((element) => {
   element.addEventListener('click', () => {
     const selected = element.dataset.source
     queue.push(selected)

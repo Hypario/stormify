@@ -5,10 +5,10 @@
     <button id="player-play" class="btn-primary">Play</button>
   </div>
   @each(song in songs)
-    <div class="player">
+    <div class="song-info">
       <p>{{ song.title }}</p>
       <button class="song-play btn-primary" data-source="{{ route('listen', { id: song.id}) }}">play</button>
-      <button class="queue-add btn-primary" data-source="{{ route('listen', { id: song.id}) }}">add to queue</button>
+      <button class="song-queue-add btn-primary" data-source="{{ route('listen', { id: song.id}) }}">add to queue</button>
     </div>
   @else
     <h1>Aucune musique disponible</h1>
