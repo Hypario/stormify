@@ -1,69 +1,93 @@
-const audio = document.createElement('audio');
-const source = document.createElement('source');
-source.src = "";
-
+const audioElement = document.createElement('audio')
 const playButton = document.getElementById("player-play")
+const audioSource = document.createElement('source')
+audioElement.appendChild(audioSource)
+audioSource.src = ""
 
-const queue = [];
-let current = null;
+const machine = {
+  initial: "playing",
+  context: {
+    current: '',
+    queue: []
+  },
+  states: {
+    playing: () => {
+      playButton.classList.remove("btn-primary")
+      playButton.classList.add('btn-danger')
+      playButton.innerText = "Pause"
 
-audio.appendChild(source);
+      audioElement.play();
+      return "paused"
+    },
+    paused: () => {
+      playButton.classList.remove("btn-danger")
+      playButton.classList.add('btn-primary')
+      playButton.innerText = "Play"
+
+      audioElement.pause();
+      return "playing"
+    }
+  },
+  play: (song) => {
+    let currentSrc = new URL(audioSource.src)
+    if (song !== undefined) {
+      const newSrc = new URL(song, window.location);
+
+      if (newSrc.pathname !== currentSrc.pathname) {
+        audioSource.src = newSrc.toString();
+        audioElement.load();
+
+        currentSrc = new URL(audioSource.src)
+        currentState = machine.initial
+      }
+    }
+
+    if (machine.context.queue.length > 0 && currentSrc.pathname === "/") {
+      return machine.next()
+    }
+
+    if (currentSrc.pathname !== "/") {
+      let transition = machine.states[currentState];
+      currentState = transition();
+    }
+  },
+  addQueue: (song) => {
+    machine.context.queue.push(song)
+  },
+  next: () => {
+    if (machine.context.queue.length > 0) {
+      machine.play(machine.context.queue[0])
+      machine.context.queue.shift()
+    } else {
+      let transition = machine.states["paused"]
+      currentState = transition()
+    }
+  }
+}
+
+let currentState = machine.initial
 
 // TODO : migrate to an FSM (way easier)
 
 document.querySelectorAll(".song-play").forEach((element) => {
   element.addEventListener('click', () => {
     const selected = element.dataset.source;
-    play(selected)
+    machine.play(selected)
   })
 });
 
 document.querySelectorAll(".song-queue-add").forEach((element) => {
   element.addEventListener('click', () => {
     const selected = element.dataset.source
-    queue.push(selected)
+    machine.addQueue(selected)
     console.log("added to queue : " + selected)
   })
 })
 
 playButton.addEventListener("click", () => {
-  if (current !== null)
-    play(current)
-  else if (queue.length > 0)
-    play(queue[0])
-  else {
-    console.log("No songs to play")
-  }
+  machine.play()
 })
 
-audio.addEventListener("ended", () => {
-  if (queue.length > 0) {
-    play(queue[0])
-    queue.shift()
-  }
+audioElement.addEventListener("ended", () => {
+  machine.next()
 })
-
-function play(song) {
-  const newSrc = new URL(song, window.location);
-  const currentSrc = new URL(source.src);
-  current = song
-
-  if (newSrc.pathname !== currentSrc.pathname) {
-    source.src = newSrc.toString();
-    audio.load();
-  }
-
-  if (audio.paused) {
-    console.log("playing " + song)
-    audio.play();
-    playButton.classList.remove("btn-primary")
-    playButton.classList.add('btn-danger')
-    playButton.innerText = "Pause"
-  } else if (audio) {
-    console.log("paused " + song)
-    audio.pause();
-    playButton.classList.remove("btn-danger")
-    playButton.classList.add('btn-primary')
-    playButton.innerText = "Play"
-  }
-}

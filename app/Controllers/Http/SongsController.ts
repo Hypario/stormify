@@ -3,7 +3,7 @@ import Song from 'App/Models/Song';
 import Application from '@ioc:Adonis/Core/Application'
 
 export default class SongsController {
-  
+
   public async index ({view}: HttpContextContract) {
     const songs = await Song.all()
 
@@ -15,7 +15,7 @@ export default class SongsController {
     return view.render('upload')
   }
 
-  public async store ({request}: HttpContextContract) {
+  public async store ({request, view}: HttpContextContract) {
     // types: ['audio']
     const audio = request.file('audio', {extnames: ['mp3', 'avi']});
 
@@ -33,9 +33,9 @@ export default class SongsController {
       song.title = audio.clientName
       song.type = audio.subtype
       await song.save()
-      return 'File uploaded successfully'
+      return view.render('uploaded')
     }
-    
+
     return 'Something went wrong'
   }
 
